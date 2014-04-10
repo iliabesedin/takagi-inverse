@@ -1,36 +1,19 @@
 #ifndef _GRID_FUNCTION_HPP_
 #define _GRID_FUNCTION_HPP_
 
-#include <vector>
+#include "NDVectorArray.hpp"
 #include <map>
-#include <array>
-#include <algorithm>
 
-template <size_t dim> using GridIndex = std::array<size_t, dim>;
+template <size_t dim> using GridIndex = VectorArrayIndex<dim>
 template <size_t dim> using GridCoordinate = std::array<float, dim>;
 template <size_t dim> using GridLinearCombination = std::map<GridIndex<dim>, float>;
 
-template <typename T, size_t dim> class GridFunction {
+template <typename T, size_t dim> class GridFunction : NDArray<T, dim> {
 public:
     GridCoordinate<dim> minbounds;
     GridCoordinate<dim> stepsize;
-    const GridCoordinate<dim>& size() const { return stepno; };
-    void set_size(const GridIndex<dim>& new_size) { 
-	size_t scalar_size = 1;
-	for (size_t d=0; d< dim; d++)
-	    scalar_size *= new_size[d];
-	data.resize(scalar_size);
-	stepno = new_size;
-    };
 private:
     std::vector<T> data;
-    GridIndex<dim> stepno;
-    template <size_t d> size_t ND2Scalar(const GridIndex<d>& index) const {
-	GridIndex<d-1> child_index;
-	std::copy(std::next(index.begin()), index.end(), child_index.begin());
-	return stepno[0] * this->ND2Scalar(child_index) + index[0];
-    };
-    size_t ND2Scalar(const GridIndex<1>& index) const { return index[0]; };
     template <size_t d> void NLinearCoefficientsPartial(GridLinearCombination<dim>& result, const GridCoordinate<d>& coordinates, const GridIndex<dim-d> PartialIndeces, const float& PartialWeight) const {
 	float position = (coordinates[d-1]-minbounds[d-1])/stepsize[d-1];
 	//TODO:usable exceptions
@@ -70,8 +53,6 @@ private:
 	return;
     };
 public:
-    const T& operator() (const GridIndex<dim>& indeces) const { return data[ND2Scalar(indeces)]; };
-    T& operator() (const GridIndex<dim>& indeces) { return data[ND2Scalar(indeces)]; };
     GridLinearCombination<dim>  NLinearCoefficients (const GridCoordinate<dim>& coordinates) const {
 	GridLinearCombination<dim> result;
 	NLinearCoefficientsPartial(result, coordinates, GridIndex<0>(), 1);
@@ -84,7 +65,6 @@ public:
 	    value += this->operator() (point->first) * point->second;
 	return value;
     };
-//    GridFunction (const GridCoordinate& minbounds, const GridCoordinate& stepsize, const )
 };
 
 #endif
