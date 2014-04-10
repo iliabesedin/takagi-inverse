@@ -9,10 +9,10 @@ template <size_t dim> using VectorArrayIndex = std::array<size_t, dim>;
 
 template <size_t dim> class NDVectorArray {
 public:
-    virtual const VectorArrayIndex<dim>& size() const;
-    virtual const size_t& dsize(const size_t& d) const;
+    virtual const VectorArrayIndex<dim>& size() const = 0;
+    virtual const size_t& dsize(const size_t& d) const = 0;
     template <size_t d> size_t ND2Scalar(const VectorArrayIndex<d>& index) const {
-	GridIndex<d-1> child_index;
+	VectorArrayIndex<d-1> child_index;
 	std::copy(std::next(index.begin()), index.end(), child_index.begin());
 	return dsize(dim-d) * this->ND2Scalar(child_index) + index[0];
     };
@@ -26,15 +26,15 @@ private:
 public:
     const VectorArrayIndex<dim>& size() const { return elemno; };
     const size_t& dsize(const size_t& d) const { return elemno[d]; };
-    void set_size(const VectorArrayIndex<dim>& new_size) { { 
+    void set_size(const VectorArrayIndex<dim>& new_size) { 
 	size_t scalar_size = 1;
 	for (size_t d=0; d< dim; d++)
 	    scalar_size *= new_size[d];
 	data.resize(scalar_size);
 	elemno = new_size;
     };
-    const T& operator() (const VectorArrayIndex<dim>& indeces) const { return data[ND2Scalar(indeces)]; };
-    T& operator() (const VectorArrayIndex<dim>& indeces) { return data[ND2Scalar(indeces)]; };
+    const T& operator() (const VectorArrayIndex<dim>& indeces) const { return data[this->ND2Scalar(indeces)]; };
+    T& operator() (const VectorArrayIndex<dim>& indeces) { return data[this->ND2Scalar(indeces)]; };
 };
 
 #endif

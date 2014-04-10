@@ -4,11 +4,11 @@
 #include "NDVectorArray.hpp"
 #include <map>
 
-template <size_t dim> using GridIndex = VectorArrayIndex<dim>
+template <size_t dim> using GridIndex = VectorArrayIndex<dim>;
 template <size_t dim> using GridCoordinate = std::array<float, dim>;
 template <size_t dim> using GridLinearCombination = std::map<GridIndex<dim>, float>;
 
-template <typename T, size_t dim> class GridFunction : NDArray<T, dim> {
+template <typename T, size_t dim> class GridFunction : public NDVector<T, dim> {
 public:
     GridCoordinate<dim> minbounds;
     GridCoordinate<dim> stepsize;
@@ -18,7 +18,7 @@ private:
 	float position = (coordinates[d-1]-minbounds[d-1])/stepsize[d-1];
 	//TODO:usable exceptions
 	if (position < 0) throw("Out of bounds.");
-	if (position > stepno[d-1]) throw("Out of bounds.");
+	if (position > this->dsize(d-1)) throw("Out of bounds.");
 	size_t li = floor(position);
 	size_t ri = ceil(position);
 	float rw = (position - li)*PartialWeight;
@@ -38,7 +38,7 @@ private:
     	float position = (coordinates[0]-minbounds[0])/stepsize[0];
 	//TODO:usable exceptions
 	if (position < 0) throw("Out of bounds.");
-	if (position > stepno[0]) throw("Out of bounds.");
+	if (position > this->dsize(0)) throw("Out of bounds.");
 	size_t li = floor(position);
 	size_t ri = ceil(position);
 	float rw = (position - li)*PartialWeight;
