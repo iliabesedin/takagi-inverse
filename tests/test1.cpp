@@ -8,9 +8,9 @@ int main () {
     gf1.set_size(GridIndex<dim>({ {10, 10, 10} }));
     gf1.minbounds = { 0, 0, 0 };
     gf1.stepsize = { 1, 1, 1 };
-    for (size_type i=0; i<10; i++) 
-	for (size_type j=0; j<10; j++)
-	    for (size_type k=0; k<10; k++)
+    for (size_t i=0; i<10; i++) 
+	for (size_t j=0; j<10; j++)
+	    for (size_t k=0; k<10; k++)
 		gf1(GridIndex<dim>({{ i,j,k}})) = sin(i)*sin(j)*sin(k);
     std::cout << "Testing GridFunction (3D).\n";
     std::cout << "Test 1: interpolation points and weights.\n";
