@@ -14,7 +14,7 @@ int main () {
 		gf1(GridIndex<dim>({{ i,j,k}})) = sin(i)*sin(j)*sin(k);
     std::cout << "Testing GridFunction (3D).\n";
     std::cout << "Test 1: interpolation points and weights.\n";
-    GridCoordinate<dim> p = { 5.6, 5.6, 5.6 };
+    GridCoordinate<dim> p = { 5.8, 5.8, 5.8 };
     auto ip = gf1.NLinearCoefficients(p);
     std::cout << "Interpolation points and weights are: \n";
     for (auto ip_it = ip.begin(); ip_it != ip.end(); ip_it++) {
@@ -23,6 +23,9 @@ int main () {
 	    std::cout << ip_it->first[i] << "\t";
 	std::cout << "] -> " << ip_it->second << std::endl;
     }
+    std::cout << "Interpolated value is: " << gf1.NLinearValue(p) << std::endl;
+    std::cout << "Precise value is: " << sin(5.8)*sin(5.8)*sin(5.8) << std::endl;
+    
     return 0 ;
 }
 

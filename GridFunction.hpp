@@ -26,12 +26,12 @@ public:
 private:
     std::vector<T> data;
     GridIndex<dim> stepno;
-    template <size_type d> size_type ND2Scalar(const GridIndex<d>& index) {
+    template <size_type d> size_type ND2Scalar(const GridIndex<d>& index) const {
 	GridIndex<d-1> child_index;//(std::next(index.begin()), index.end());
 	std::copy(std::next(index.begin()), index.end(), child_index.begin());
 	return stepno[0] * this->ND2Scalar(child_index) + index[0];
     };
-    size_type ND2Scalar(const GridIndex<1>& index) { return index[0]; };
+    size_type ND2Scalar(const GridIndex<1>& index) const { return index[0]; };
     template <size_type d> void NLinearCoefficientsPartial(GridLinearCombination<dim>& result, const GridCoordinate<d>& coordinates, const GridIndex<dim-d> PartialIndeces, const float& PartialWeight) const {
 	float position = (coordinates[d-1]-minbounds[d-1])/stepsize[d-1];
 	//TODO:usable exceptions
@@ -81,7 +81,7 @@ public:
     T NLinearValue (const GridCoordinate<dim>& coordinates) const {
 	GridLinearCombination<dim> points = NLinearCoefficients (coordinates);
 	T value = 0;
-	for (typename GridLinearCombination<dim>::const_iterator point = points.begin(); point != points.end(); points++)
+	for (typename GridLinearCombination<dim>::const_iterator point = points.begin(); point != points.end(); point++)
 	    value += this->operator() (point->first) * point->second;
 	return value;
     };
