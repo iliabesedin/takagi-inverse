@@ -6,19 +6,18 @@
 #include <array>
 #include <algorithm>
 
-typedef std::vector<int>::size_type size_type;
-template <size_type dim> using GridIndex = std::array<size_type, dim>;
-template <size_type dim> using GridCoordinate = std::array<float, dim>;
-template <size_type dim> using GridLinearCombination = std::map<GridIndex<dim>, float>;
+template <size_t dim> using GridIndex = std::array<size_t, dim>;
+template <size_t dim> using GridCoordinate = std::array<float, dim>;
+template <size_t dim> using GridLinearCombination = std::map<GridIndex<dim>, float>;
 
-template <typename T, size_type dim> class GridFunction {
+template <typename T, size_t dim> class GridFunction {
 public:
     GridCoordinate<dim> minbounds;
     GridCoordinate<dim> stepsize;
     const GridCoordinate<dim>& size() const { return stepno; };
     void set_size(const GridIndex<dim>& new_size) { 
-	size_type scalar_size = 1;
-	for (size_type d=0; d< dim; d++)
+	size_t scalar_size = 1;
+	for (size_t d=0; d< dim; d++)
 	    scalar_size *= new_size[d];
 	data.resize(scalar_size);
 	stepno = new_size;
@@ -26,19 +25,19 @@ public:
 private:
     std::vector<T> data;
     GridIndex<dim> stepno;
-    template <size_type d> size_type ND2Scalar(const GridIndex<d>& index) const {
-	GridIndex<d-1> child_index;//(std::next(index.begin()), index.end());
+    template <size_t d> size_t ND2Scalar(const GridIndex<d>& index) const {
+	GridIndex<d-1> child_index;
 	std::copy(std::next(index.begin()), index.end(), child_index.begin());
 	return stepno[0] * this->ND2Scalar(child_index) + index[0];
     };
-    size_type ND2Scalar(const GridIndex<1>& index) const { return index[0]; };
-    template <size_type d> void NLinearCoefficientsPartial(GridLinearCombination<dim>& result, const GridCoordinate<d>& coordinates, const GridIndex<dim-d> PartialIndeces, const float& PartialWeight) const {
+    size_t ND2Scalar(const GridIndex<1>& index) const { return index[0]; };
+    template <size_t d> void NLinearCoefficientsPartial(GridLinearCombination<dim>& result, const GridCoordinate<d>& coordinates, const GridIndex<dim-d> PartialIndeces, const float& PartialWeight) const {
 	float position = (coordinates[d-1]-minbounds[d-1])/stepsize[d-1];
 	//TODO:usable exceptions
 	if (position < 0) throw("Out of bounds.");
 	if (position > stepno[d-1]) throw("Out of bounds.");
-	size_type li = floor(position);
-	size_type ri = ceil(position);
+	size_t li = floor(position);
+	size_t ri = ceil(position);
 	float rw = (position - li)*PartialWeight;
 	float lw = (ri - position)*PartialWeight;
 	GridIndex<dim-d+1> li_full, ri_full;
@@ -57,8 +56,8 @@ private:
 	//TODO:usable exceptions
 	if (position < 0) throw("Out of bounds.");
 	if (position > stepno[0]) throw("Out of bounds.");
-	size_type li = floor(position);
-	size_type ri = ceil(position);
+	size_t li = floor(position);
+	size_t ri = ceil(position);
 	float rw = (position - li)*PartialWeight;
 	float lw = (ri - position)*PartialWeight;
 	GridIndex<dim> li_full, ri_full;
