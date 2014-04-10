@@ -19,7 +19,7 @@ int main () {
     std::cout << "Interpolation points and weights are: \n";
     for (auto ip_it = ip.begin(); ip_it != ip.end(); ip_it++) {
 	std::cout << "[";
-	for (size_type i=0; i< dim; i++)
+	for (size_t i=0; i< dim; i++)
 	    std::cout << ip_it->first[i] << "\t";
 	std::cout << "] -> " << ip_it->second << std::endl;
     }
